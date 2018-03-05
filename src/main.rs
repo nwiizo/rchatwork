@@ -1,19 +1,25 @@
-use std::process::Command;
+extern crate curl;
 
+use curl::easy::{Easy,List};
+
+// Capture output into a local `Vec`.
 fn main() {
-    let output = Command::new("curl")
-        .arg("-X POST")
-        .arg("-H")
-        .arg("'X-Chatworktoken: $token'")
-        .arg("-d")
-        .arg("'body=$data'")
-        .arg("https://api.chatwork.com/v2/rooms/$room/messages")
-        .env("token","*****************************")
-        .env("room","*******")
-        .env("data","sample")
-        .output()
-        .expect("curl command failed to start");
-    
-    let hello = output.stdout;
-    println!("{}", std::str::from_utf8(&hello).unwrap());
+    let mut dst = Vec::new();
+    let mut easy = Easy::new();
+    let mut roomid:&str  = "*************";
+    let mut cw_token:&str = "**********************";
+    let mut data = "body=this is the body".as_bytes();
+    let mut list = List::new();
+        list.append("X-ChatWorkToken: *************************").unwrap();
+        easy.http_headers(list).unwrap();
+    easy.url("https://api.chatwork.com/v2/rooms/***************/messages").unwrap();
+    easy.post(true).unwrap();
+    easy.post_field_size(data.len() as u64).unwrap();
+
+    let mut transfer = easy.transfer();
+    transfer.write_function(|data| {
+        dst.extend_from_slice(data);
+        Ok(data.len())
+    }).unwrap();
+    transfer.perform().unwrap();
 }
