@@ -64,7 +64,7 @@ fn env_chatwork_token() -> Result<std::string::String, String> {
 
 fn parse_args() -> Result<(u32, String), String> {
     let mut args = std::env::args();
-    args.next(); // プログラムの名前なので無視します
+    args.next();
     let room_id = match args.next() {
         Some(s) => s.parse::<u32>()
             .or(Err("arg1 expected number for room_id".to_string())),
